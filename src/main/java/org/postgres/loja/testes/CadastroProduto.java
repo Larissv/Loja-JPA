@@ -1,27 +1,29 @@
 package org.postgres.loja.testes;
 
-import org.postgres.loja.modelo.ProdutoEntity;
+import org.postgres.loja.dao.CategoriaDao;
+import org.postgres.loja.dao.ProdutoDao;
+import org.postgres.loja.modelo.Categoria;
+import org.postgres.loja.modelo.Produto;
+import org.postgres.loja.util.JPAUtil;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.math.BigDecimal;
 
 public class CadastroProduto {
 
     public static void main(String[] args) {
-        ProdutoEntity celular = new ProdutoEntity();
-        celular.setName("Xiaomi Redmi");
-        celular.setDescription("Muito legal");
-        celular.setCost(new BigDecimal("800"));
+        Categoria celulares = new Categoria("CELULARES");
+        Produto celular = new Produto("Xiaomi Redmi", "Muito legal", new BigDecimal("800"), celulares );
 
-        EntityManagerFactory factory = Persistence
-                .createEntityManagerFactory("loja");
-
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
+        ProdutoDao produtoDao = new ProdutoDao(em);
+        CategoriaDao categoriaDao = new CategoriaDao(em);
 
         em.getTransaction().begin();
-        em.persist(celular);
+
+        categoriaDao.cadastrar(celulares);
+        produtoDao.cadastrar(celular);
+
         em.getTransaction().commit();
         em.close();
     }

@@ -9,6 +9,7 @@ import org.postgres.loja.util.JPAUtil;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class CadastroDePedido {
 
@@ -30,6 +31,12 @@ public class CadastroDePedido {
         pedidoDao.cadastrar(pedido);
 
         em.getTransaction().commit();
+
+        BigDecimal totalVendido = pedidoDao.valorTotalVendido();
+        System.out.println("Valor total: " + totalVendido);
+
+        List<RelatorioDeVendas> relatorioDeVendas = pedidoDao.relatorioDeVendas();
+        relatorioDeVendas.forEach(System.out::println);
     }
 
     private static void populaBancoDeDados() {

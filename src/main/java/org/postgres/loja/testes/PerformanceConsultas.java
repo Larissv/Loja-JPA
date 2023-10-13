@@ -9,44 +9,19 @@ import org.postgres.loja.util.JPAUtil;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.List;
 
-public class CadastroDePedido {
+public class PerformanceConsultas {
 
     public static void main(String[] args) {
-        populaBancoDeDados();
+        popularBancoDeDados();
         EntityManager em = JPAUtil.getEntityManager();
-        ProdutoDao produtoDao = new ProdutoDao(em);
-        ClienteDao clienteDao = new ClienteDao(em);
-
-        Produto produto = produtoDao.buscarPorId(1L);
-        Produto produto2 = produtoDao.buscarPorId(2L);
-        Produto produto3 = produtoDao.buscarPorId(3L);
-        Cliente cliente = clienteDao.buscarPorId(1L);
-
-        em.getTransaction().begin();
-
-        Pedido pedido = new Pedido(cliente);
-        pedido.adicionarItem(new ItemPedido(10, pedido, produto));
-        pedido.adicionarItem(new ItemPedido(40, pedido, produto2));
-
-        Pedido pedido2 = new Pedido(cliente);
-        pedido2.adicionarItem(new ItemPedido(2, pedido2, produto3));
-
         PedidoDao pedidoDao = new PedidoDao(em);
-        pedidoDao.cadastrar(pedido);
-        pedidoDao.cadastrar(pedido2);
-
-        em.getTransaction().commit();
-
-        BigDecimal totalVendido = pedidoDao.valorTotalVendido();
-        System.out.println("Valor total: " + totalVendido);
-
-        List<RelatorioDeVendas> relatorioDeVendas = pedidoDao.relatorioDeVendas();
-        relatorioDeVendas.forEach(System.out::println);
+        Pedido pedido = pedidoDao.buscarPedidoComCliente(1l);
+        em.close();
+        System.out.println(pedido.getCliente().getNome());
     }
 
-    private static void populaBancoDeDados() {
+    private static void popularBancoDeDados() {
         Categoria celulares = new Categoria("CELULARES");
         Categoria videogames = new Categoria("VIDEOGAMES");
         Categoria informatica = new Categoria("INFORMATICA");
@@ -64,12 +39,20 @@ public class CadastroDePedido {
                 new BigDecimal("14000"),
                 informatica);
 
-        Cliente cliente = new Cliente("Larissa", "123456");
+        Cliente cliente = new Cliente("Rodrigo", "123456");
+
+        Pedido pedido = new Pedido(cliente);
+        pedido.adicionarItem(new ItemPedido(10, pedido, celular));
+        pedido.adicionarItem(new ItemPedido(40, pedido, videogame));
+
+        Pedido pedido2 = new Pedido(cliente);
+        pedido2.adicionarItem(new ItemPedido(2, pedido2, macbook));
 
         EntityManager em = JPAUtil.getEntityManager();
         ProdutoDao produtoDao = new ProdutoDao(em);
         CategoriaDao categoriaDao = new CategoriaDao(em);
         ClienteDao clienteDao = new ClienteDao(em);
+        PedidoDao pedidoDao = new PedidoDao(em);
 
         em.getTransaction().begin();
 
@@ -82,6 +65,9 @@ public class CadastroDePedido {
         produtoDao.cadastrar(macbook);
 
         clienteDao.cadastrar(cliente);
+
+        pedidoDao.cadastrar(pedido);
+        pedidoDao.cadastrar(pedido2);
 
         em.getTransaction().commit();
         em.close();

@@ -23,6 +23,11 @@ public class Pedido {
         this.cliente = cliente;
     }
 
+    public void adicionarItem(ItemPedido item) {
+        item.setPedido(this);
+        this.itens.add(item);
+    }
+
     public Pedido() {
     }
 
